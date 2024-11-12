@@ -1,0 +1,1 @@
+python ../train.py --model_name real_play_s_v2 --config_path ~/project/packages/emulator/config_s_v2.json --ckpt_dir ~/project/ckpt/unet --data_dir ~/project/data/data/sum --valid_ratio 0.02 --device cuda:0 --ignore_prev

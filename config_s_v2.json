@@ -1,0 +1,53 @@
+{
+    "--------------- Training configuration --------------------": "", 
+    "batch_size": 16,
+    "epoch": 700, 
+    "learning_rate": 0.0001,
+    "seed": 1234,
+    "beta1": 0.8, 
+    "beta2": 0.99, 
+    "ckpt_interval": 50, 
+    "valid_interval": 10, 
+    "valid_ratio": 0.02, 
+    "--------------- Training configuration end --------------------": "", 
+
+    "--------------- directory configuration --------------------": "", 
+    "tensorboard_path": "/home/research_dh/project/logs/unet", 
+    "vocoder_config_path": "/home/research_dh/project/packages/emulator/bigvgan/configs/bigvgan_v2_44khz_128band_256x.json", 
+    "vocoder_ckpt_path": "/home/research_dh/project/packages/emulator/bigvgan/ckpt/bigvgan_generator.pt", 
+    "--------------- directory configuration end --------------------": "", 
+
+
+    "--------------- Audio processing configuration --------------------": "", 
+    "sampling_rate": 44100, 
+    "n_fft": 1024, 
+    "hop_size": 256, 
+    "n_mels": 128, 
+    "fmax": null, 
+    "fmin": 0, 
+    "frame_size": 256, 
+    "top_db": 70, 
+    "--------------- Audio processing configuration end --------------------": "", 
+
+
+    "------------------ Unet configuration -------------": "", 
+
+    "conv": "[conv, n_out_channel, kernel_size]", 
+    "relu": "", 
+    "lin": "[n_out_channel]", 
+    "Each module's # of input channel is set with previous module's # of output channel": "", 
+
+    "encoder_list": [
+        [["conv", 64, 3], ["relu"], ["conv", 64, 3], ["relu"]], 
+        [["conv", 128, 3], ["relu"], ["conv", 128, 3], ["relu"]] 
+    ], 
+
+    "mid_list": [128, [["conv", 256, 3], ["relu"], ["FiLM"], ["conv", 256, 3], ["relu"], ["FiLM"]]], 
+
+    "decoder_list": [256, 
+        [["conv", 128, 3], ["relu"], ["conv", 128, 3], ["relu"]],
+        [["conv", 64, 3], ["relu"], ["conv", 64, 3], ["relu"], ["conv", 1, 1]]
+    ],
+
+    "----------------- Unet configuration end -------------": ""
+}
