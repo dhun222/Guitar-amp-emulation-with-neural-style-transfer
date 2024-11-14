@@ -42,7 +42,6 @@ class PairDataset(Dataset):
     Expect same length of audio files. 
     """
     def __init__(self, data_dir, frame_size, mel_fn, device='cpu', make_txt_file=False):
-        super().__init__()
         self.device = device
         x_list, y_list, emb_list = make_file_list(data_dir, make_txt_file)
 
@@ -64,8 +63,8 @@ class PairDataset(Dataset):
             self.n_frame_list.append(n_frame)
             self.len = self.len + n_frame
         self.cur_file_idx = 0
-        self.cache_x = load_wav(os.path.join(self.data_dir, self.x_file_list[self.cur_file_idx])).to(self.device)
-        self.cache_y = load_wav(os.path.join(self.data_dir, self.y_file_list[self.cur_file_idx])).to(self.device)
+        self.cache_x = load_wav(os.path.join(self.data_dir, self.x_file_list[self.cur_file_idx]))
+        self.cache_y = load_wav(os.path.join(self.data_dir, self.y_file_list[self.cur_file_idx]))
         self.cache_x = self.mel_fn(self.cache_x)
         self.cache_y = self.mel_fn(self.cache_y)
         self.cache_x = split_mel(self.cache_x, self.frame_size)
@@ -86,14 +85,14 @@ class PairDataset(Dataset):
 
         if file_idx != self.cur_file_idx:
             self.cur_file_idx = file_idx
-            self.cache_x = load_wav(os.path.join(self.data_dir, self.x_file_list[file_idx])).to(self.device)
-            self.cache_y = load_wav(os.path.join(self.data_dir, self.y_file_list[file_idx])).to(self.device)
+            self.cache_x = load_wav(os.path.join(self.data_dir, self.x_file_list[file_idx]))
+            self.cache_y = load_wav(os.path.join(self.data_dir, self.y_file_list[file_idx]))
             self.cache_x = self.mel_fn(self.cache_x)
             self.cache_y = self.mel_fn(self.cache_y)
             self.cache_x = split_mel(self.cache_x, self.frame_size)
             self.cache_y = split_mel(self.cache_y, self.frame_size)
 
-        return self.cache_x[idx - cur, ...], self.cache_y[idx - cur, ...], self.emb_list[file_idx].to(self.device)
+        return self.cache_x[idx - cur, ...], self.cache_y[idx - cur, ...], self.emb_list[file_idx]
 
 class IdxSampler(Sampler):
     def __init__(self, idx):
