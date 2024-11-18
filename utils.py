@@ -130,15 +130,16 @@ def get_config(path):
 
 def split_mel(x, frame_size):
     """
-    x : 2-D tensor. [length, n_mels]
-    split x into sub tensors wiht the length of n_frame and concatenate them
-    Additional dimensions such as batch have to be handled outside of this function.
+    x : 2-D tensor. [..., length, n_mels]
     """
-    n_frame = x.shape[0] // frame_size
+    n_frame = x.shape[-2] // frame_size
     # Cut out the left part
-    x = x[0:n_frame * frame_size, :]
-    
-    return x.reshape(n_frame, frame_size, x.shape[1])
+    x = x[..., 0:n_frame * frame_size, :]
+    shape = list(x.shape[0:len(x.shape) - 2])
+    shape.append(n_frame)
+    shape.append(frame_size)
+    shape.append(x.shape[-1])
+    return x.reshape(shape)
 
 def cat_mel(x):
     x = x.reshape((x.shape[0] * x.shape[1], x.shape[2]))

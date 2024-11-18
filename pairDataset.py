@@ -41,8 +41,7 @@ class PairDataset(Dataset):
     Dataset for Unet training
     Expect same length of audio files. 
     """
-    def __init__(self, data_dir, frame_size, mel_fn, device='cpu', make_txt_file=False):
-        self.device = device
+    def __init__(self, data_dir, frame_size, mel_fn, make_txt_file=False):
         x_list, y_list, emb_list = make_file_list(data_dir, make_txt_file)
 
         self.data_dir = data_dir

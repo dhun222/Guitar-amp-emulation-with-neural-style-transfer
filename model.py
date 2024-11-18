@@ -84,11 +84,14 @@ class Decoder(nn.Module):
             if self.verbose:
                 print(f"\nmodule # {i} : {module}")
             if isinstance(module, upsample_fn):
-                x = module(x)
                 if self.verbose:
                     print("input : ", x.shape)
+                x = module(x)
+                x = torch.cat((skip[skip_idx], x), -3)
+                if self.verbose:
                     print("skip connection input : ", skip[skip_idx].shape)
-                x = torch.cat((skip[skip_idx], x), 1)
+                    print(f"after cat : {x.shape}")
+
                 skip_idx = skip_idx + 1
             elif isinstance(module, FiLM_layer):
                 if self.verbose:
@@ -97,7 +100,8 @@ class Decoder(nn.Module):
                 FiLM_idx = FiLM_idx + 1
             else:
                 x = module(x)
-            
+        if self.verbose:
+            print(f"output : {x.shape}") 
         return x
 
     def makeSequential(self, conf_list):
@@ -325,12 +329,7 @@ class Emulator(nn.Module):
         mel = split_mel(mel, self.h.frame_size).to(self.device)
         y_mel = self.unet(mel, emb)
         y_mel = cat_mel(y_mel).T
-        wav = self.vocoder(y_mel.unsqueeze(0))
+        wav = self.vocoder(y_mel.unsqueeze(0)).squeeze(0).squeeze(0)
 
         return wav
     
-    def inference(self, x, emb):
-        with torch.no_grad():
-            wav = self.forward(x, emb)
-        return wav
-
