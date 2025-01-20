@@ -5,6 +5,8 @@ from torchaudio.transforms import MelSpectrogram, AmplitudeToDB
 import librosa as lr
 import matplotlib.pyplot as plt
 import json
+import os
+from soundfile import write
 
 """
 Mel spectrogram candidate 1
@@ -128,7 +130,7 @@ def get_config(path):
     return h
 
 
-def split_mel(x, frame_size):
+def split_mel(x:torch.Tensor, frame_size)->torch.Tensor:
     """
     x : 2-D tensor. [..., length, n_mels]
     """
@@ -152,6 +154,10 @@ def load_wav(path):
     x = x[0] / 32768
     assert x.dtype == torch.float32
     return x
+
+def write_wav(y:torch.Tensor, path:str, name:str, sr:int=44100)->None:
+    write(os.path.join(path, name + ".wav"), y, samplerate=sr, subtype='PCM_16')
+
 
 def ftime(sec):
     mil = sec % 1

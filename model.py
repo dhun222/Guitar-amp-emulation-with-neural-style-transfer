@@ -4,7 +4,7 @@ import os
 from utils import get_config, split_mel, cat_mel
 from pairDataset import Mel_fn_bigvgan
 from bigvgan.bigvgan import BigVGAN as Vocoder
-
+import time
 
 """
 Unet model and helper functions
@@ -295,7 +295,7 @@ class Unet(nn.Module):
 
   
 class Emulator(nn.Module):
-    def __init__(self, model_name, h, ckpt_path, device):
+    def __init__(self, model_name, h, ckpt_path, device)->nn.Module:
         super().__init__()
         self.h = h
 
@@ -323,13 +323,24 @@ class Emulator(nn.Module):
         self.vocoder.remove_weight_norm()
 
 
-    def forward(self, x, emb):
+    def forward(self, x:torch.Tensor, emb:torch.Tensor)->torch.Tensor:
+        start_time = time.time_ns()
+
         emb = emb.to(self.device)
+        emb_time = time.time_ns()
         mel = self.mel_fn(x)
         mel = split_mel(mel, self.h.frame_size).to(self.device)
+        preprocess_time = time.time_ns()
         y_mel = self.unet(mel, emb)
         y_mel = cat_mel(y_mel).T
+        unet_and_cat_time = time.time_ns()
         wav = self.vocoder(y_mel.unsqueeze(0)).squeeze(0).squeeze(0)
+        vocoder_time = time.time_ns()
+
+        print(f"emb time : {(emb_time - start_time) / 1000000}")
+        print(f"preprocess time : {(preprocess_time - emb_time) / 1000000}")
+        print(f"unet and cat time : {(unet_and_cat_time - preprocess_time) / 1000000}")
+        print(f"vocoder time : {(vocoder_time - unet_and_cat_time) / 1000000}")
 
         return wav
     
